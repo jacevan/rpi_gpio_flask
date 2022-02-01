@@ -15,6 +15,12 @@ b6 = Button(6)
 b6.when_pressed = l1.on
 b6.when_released = l1.off
 
+for i in range(5):
+  l1.on()
+  sleep(0.75)
+  l1.off()
+  sleep(0.75)
+
 # l3 = LED(3)
 # p7 = PWMLED(7)
 # p7.value = 0.0
