@@ -19,7 +19,8 @@ str = type('')
 import os
 from collections import namedtuple
 from time import time, sleep
-from threading import Thread, Event
+# HACK added Lock and Timer
+from threading import Thread, Event, Lock, Timer
 try:
     from math import isclose
 except ImportError:
@@ -38,8 +39,7 @@ from ..exc import (
 from ..devices import Device
 from .local import LocalPiPin, LocalPiFactory
 
-# HACK Additional imports for file persistence of pins
-import threading
+# HACK Additional import for file persistence of pins
 import json
 # Added code FINISH
 
@@ -449,7 +449,7 @@ class MockFactory(LocalPiFactory):
 
         # HACK Persist pins to file on __init__()
         self.persist_time = 0
-        self.lock = threading.Lock()
+        self.lock = Lock()
         self.persist_pins()
         # Added code FINISH
 
@@ -475,7 +475,7 @@ class MockFactory(LocalPiFactory):
         self.write_pins_to_file()
         if self.persist_time < 10:
           self.persist_time += step
-          threading.Timer(step, self.persist_pins).start()
+          Timer(step, self.persist_pins).start()
 
     def get_input(self):
         with open("input", "r") as in_file:
@@ -492,6 +492,7 @@ class MockFactory(LocalPiFactory):
         self.pins_to_file = {}
         for pin in self.pins:
             self.pins_to_file[pin] = self.pins[pin].state
+            
         with self.lock:
             with open("output", "w") as out_file:
                 json.dump(self.pins_to_file, out_file)
